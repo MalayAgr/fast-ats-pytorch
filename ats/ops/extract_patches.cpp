@@ -6,19 +6,13 @@ using namespace torch::indexing;
 
 #define CHECK_CUDA(x) TORCH_CHECK(x.device().is_cuda(), #x " must be a CUDA tensor")
 #define CHECK_CONTIGUOUS(x) TORCH_CHECK(x.is_contiguous(), #x " must be contiguous")
-#define CHECK_INPUT(x) \
-    CHECK_CUDA(x);     \
+#define CHECK_INPUT(x)                                                                                                 \
+    CHECK_CUDA(x);                                                                                                     \
     CHECK_CONTIGUOUS(x)
 
-torch::Tensor extract_patches_cuda(
-    torch::Tensor img,
-    torch::Tensor offsets,
-    c10::ArrayRef<long int> patch_size);
+torch::Tensor extract_patches_cuda(torch::Tensor img, torch::Tensor offsets, c10::ArrayRef<long int> patch_size);
 
-torch::Tensor extract_patches_no_cuda(
-    torch::Tensor img,
-    torch::Tensor offsets,
-    c10::ArrayRef<long int> patch_size)
+torch::Tensor extract_patches_no_cuda(torch::Tensor img, torch::Tensor offsets, c10::ArrayRef<long int> patch_size)
 {
     img = img.permute({0, 3, 1, 2});
 
@@ -34,8 +28,7 @@ torch::Tensor extract_patches_no_cuda(
 
     std::vector<torch::Tensor> patches;
 
-    at::parallel_for(0, img.size(0), 0, [&](int64_t start, int64_t end)
-                     {
+    at::parallel_for(0, img.size(0), 0, [&](int64_t start, int64_t end) {
         for (int64_t b = start; b < end; b++)
         {
             for (int64_t n = 0; n < offset_acc.size(1); n++)
@@ -49,15 +42,13 @@ torch::Tensor extract_patches_no_cuda(
 
                 patches.push_back(patch);
             }
-        } });
+        }
+    });
 
     return torch::stack(patches);
 }
 
-torch::Tensor extract_patches(
-    torch::Tensor img,
-    torch::Tensor offsets,
-    c10::ArrayRef<long int> patch_size)
+torch::Tensor extract_patches(torch::Tensor img, torch::Tensor offsets, c10::ArrayRef<long int> patch_size)
 {
     auto cuda_available = torch::cuda::is_available();
 
