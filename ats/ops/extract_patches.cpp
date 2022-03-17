@@ -55,10 +55,10 @@ torch::Tensor extract_patches(torch::Tensor img, torch::Tensor offsets, c10::Arr
     if (!cuda_available)
         return extract_patches_cpu(img, offsets, patch_size);
 
-    // CHECK_INPUT(img);
-    // CHECK_INPUT(offsets);
+    CHECK_INPUT(img);
+    CHECK_INPUT(offsets);
 
-    // return extract_patches_cuda(img, offsets, patch_size);
+    return extract_patches_cuda(img, offsets, patch_size);
 }
 
 PYBIND11_MODULE(TORCH_EXTENSION_NAME, m)
