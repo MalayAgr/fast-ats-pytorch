@@ -12,7 +12,7 @@ using namespace torch::indexing;
 
 torch::Tensor extract_patches_cuda(torch::Tensor img, torch::Tensor offsets, c10::ArrayRef<long int> patch_size);
 
-torch::Tensor extract_patches_no_cuda(torch::Tensor img, torch::Tensor offsets, c10::ArrayRef<long int> patch_size)
+torch::Tensor extract_patches_cpu(torch::Tensor img, torch::Tensor offsets, c10::ArrayRef<long int> patch_size)
 {
     img = img.permute({0, 3, 1, 2});
 
@@ -53,7 +53,7 @@ torch::Tensor extract_patches(torch::Tensor img, torch::Tensor offsets, c10::Arr
     auto cuda_available = torch::cuda::is_available();
 
     if (!cuda_available)
-        return extract_patches_no_cuda(img, offsets, patch_size);
+        return extract_patches_cpu(img, offsets, patch_size);
 
     // CHECK_INPUT(img);
     // CHECK_INPUT(offsets);
