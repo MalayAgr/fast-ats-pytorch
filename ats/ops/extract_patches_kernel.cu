@@ -23,9 +23,6 @@ __global__ void extract_patches_kernel(
 
     const int patch_idx = (b * n_samples) + n;
 
-    printf("%lu,%lu,%lu,%lu\n", b, n, c, patch_idx);
-    printf("%lu,%lu,%lu\n", batch_size, n_samples, channels);
-
 
     auto x_start = (int)(offsets[b][n][0]);
     auto x_end = x_start + patch_H;
@@ -45,8 +42,6 @@ torch::Tensor extract_patches_cuda(torch::Tensor img, torch::Tensor offsets, c10
     auto channels = img.size(1);
     auto n_samples = offsets.size(1);
 
-    printf("%d, %d, %d\n", batch_size, channels, n_samples);
-
     auto pad_const = (int)(patch_size[0] / 2.0);
     img = torch::constant_pad_nd(img, {pad_const, pad_const, pad_const, pad_const}, 0.0);
 
@@ -60,7 +55,7 @@ torch::Tensor extract_patches_cuda(torch::Tensor img, torch::Tensor offsets, c10
     auto patches = torch::zeros({batch_size * n_samples, channels, patch_H, patch_W}, options);
 
     const int n = batch_size * n_samples * channels;
-    const int threads = 64;
+    const int threads = 1024;
     const int blocks = (n + threads - 1) / threads;
 
     AT_DISPATCH_FLOATING_TYPES(img.scalar_type(), "extract_patch", ([&] {
