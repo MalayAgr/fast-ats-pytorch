@@ -1,3 +1,4 @@
+import glob
 import os
 
 from setuptools import find_packages, setup
@@ -6,10 +7,8 @@ from torch.utils.cpp_extension import (BuildExtension, CppExtension,
 
 USE_CUDA = os.environ.get("USE_CUDA", "True") == "True"
 
-source_files = [
-    os.path.join("ops", "extract_patches.cpp"),
-    os.path.join("ops", "extract_patches_cpu.cpp"),
-]
+source_files = glob.glob("ops/*.cpp")
+source_files += glob.glob("ops/cpu/*.cpp")
 
 with open("README.md", "r") as f:
     long_description = f.read()
@@ -18,8 +17,8 @@ with open("README.md", "r") as f:
 def launch_setup():
     if USE_CUDA is True:
         Extension = CUDAExtension
-        kernel = os.path.join("ops", "extract_patches_kernel.cu")
-        source_files.append(kernel)
+        kernels = glob.glob("ops/cuda/*.cu")
+        source_files.extend(kernels)
         macro = [("USE_CUDA", None)]
     else:
         Extension = CppExtension
