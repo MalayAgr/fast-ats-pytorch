@@ -23,7 +23,6 @@ __global__ void extract_patches_kernel(
 
     const int patch_idx = (b * n_samples) + n;
 
-
     auto x_start = (int)(offsets[b][n][0]);
     auto x_end = x_start + patch_H;
     auto y_start = (int)(offsets[b][n][1]);
@@ -61,9 +60,9 @@ torch::Tensor extract_patches_cuda(torch::Tensor img, torch::Tensor offsets, c10
     AT_DISPATCH_FLOATING_TYPES(img.scalar_type(), "extract_patch", ([&] {
                                    extract_patches_kernel<scalar_t><<<blocks, threads>>>(
                                        img.packed_accessor32<scalar_t, 4, torch::RestrictPtrTraits>(),
-                                       offsets.packed_accessor32<scalar_t, 3, torch::RestrictPtrTraits>(),
-                                       batch_size, n_samples, channels, patch_H,
-                                       patch_W, patches.packed_accessor32<scalar_t, 4, torch::RestrictPtrTraits>());
+                                       offsets.packed_accessor32<scalar_t, 3, torch::RestrictPtrTraits>(), batch_size,
+                                       n_samples, channels, patch_H, patch_W,
+                                       patches.packed_accessor32<scalar_t, 4, torch::RestrictPtrTraits>());
                                }));
 
     return patches;
